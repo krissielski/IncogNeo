@@ -36,7 +36,7 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() 
 {
-    m_drivetrain->DriveWithGamepad(); 
+    //m_drivetrain->DriveWithGamepad(); 
 }
 
 

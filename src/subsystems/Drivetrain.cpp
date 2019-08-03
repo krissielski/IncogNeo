@@ -9,10 +9,10 @@
 #include "GamepadMap.h"
 #include "subsystems/Drivetrain.h"
 
+#include "commands/CmdDriveWithGamepad.h"
+
 Drivetrain::Drivetrain() : Subsystem("Drivetrain") 
 {
-	std::cout << "In Drivetrain" << std::endl;
-
 	leftMotor         = new frc::Spark(0);
 	rightMotor        = new frc::Spark(1);
 	differentialDrive = new frc::DifferentialDrive(*leftMotor, *rightMotor);
@@ -20,8 +20,7 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 
 void Drivetrain::InitDefaultCommand() {
   // Set the default command for a subsystem here.
-  // SetDefaultCommand(new MySpecialCommand());
-  //SetDefaultCommand(new CmdDriveWithGamepad() );
+  SetDefaultCommand(new CmdDriveWithGamepad() );
 }
 
 // Put methods for controlling this subsystem
