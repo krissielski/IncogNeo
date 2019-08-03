@@ -21,6 +21,7 @@ void Robot::RobotInit() {
     //*************************** INIT ******************************
     std::cout<<"RobotInit"<<std::endl;
     std::cout<<"IncogSparks: Offseason 2019"<<std::endl;
+    std::cout<<"Optimized Directory Structure"<<std::endl;
     std::cout<<"Version: " << __DATE__ <<"  "<<__TIME__<<std::endl<<std::endl; 
 
 
