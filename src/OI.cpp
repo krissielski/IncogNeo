@@ -7,8 +7,16 @@
 
 #include "OI.h"
 
-#include <frc/WPILib.h>
 
-OI::OI() {
-  // Process operator interface input here.
+OI::OI() 
+{
+    //Init Gamepad
+    gamepad = new frc::Joystick(0);
+
+
+}
+
+
+frc::Joystick* OI::GetGamepad() {
+  return gamepad;
 }

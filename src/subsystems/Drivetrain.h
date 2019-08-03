@@ -8,13 +8,28 @@
 #pragma once
 
 #include <frc/commands/Subsystem.h>
+#include "frc/WPILib.h"
 
-class ExampleSubsystem : public frc::Subsystem {
- public:
-  ExampleSubsystem();
-  void InitDefaultCommand() override;
-
+class Drivetrain : public frc::Subsystem {
  private:
   // It's desirable that everything possible under private except
   // for methods that implement subsystem capabilities
+
+
+  frc::SpeedController    *leftMotor;
+  frc::SpeedController    *rightMotor;
+  frc::DifferentialDrive  *differentialDrive;
+
+ public:
+  Drivetrain();
+  void InitDefaultCommand() override;
+
+  //Our Functions
+
+
+  //Drive
+  void   DriveWithGamepad( void );
+  void   Drive( double left, double right );
+  void   Stop( void );
+
 };
