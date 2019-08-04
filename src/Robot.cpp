@@ -49,7 +49,7 @@ void Robot::RobotPeriodic()
 {
     //m_drivetrain->DriveWithGamepad(); 
 
-    m_odometry->Periodic();
+    m_odometry->OdometryPeriodic();
 
     Write2Dashboard();
 }
@@ -87,7 +87,11 @@ void Robot::TeleopInit() {
 
 }
 
-void Robot::TeleopPeriodic() { frc::Scheduler::GetInstance()->Run(); }
+void Robot::TeleopPeriodic() 
+{
+
+    frc::Scheduler::GetInstance()->Run(); 
+}
 
 void Robot::TestPeriodic() {}
 
@@ -129,6 +133,8 @@ void Write2Dashboard(void)
     //Time
     //frc::SmartDashboard::PutNumber("FPGATime2",  Robot::m_timer->GetFPGATimestamp() );   //(double) sec
     //frc::SmartDashboard::PutNumber("Timer",      Robot::m_timer->Get() );                //Manual Timer sec
+
+
 
 
 }

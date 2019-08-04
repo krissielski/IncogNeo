@@ -24,7 +24,7 @@ void Odometry::InitDefaultCommand() {
 // here. Call these from Commands.
 
 //********************************************
-void Odometry::Periodic(void)
+void Odometry::OdometryPeriodic(void)
 {
 
     //Read Encoders and find delta distance traveled in inches
@@ -48,7 +48,8 @@ void Odometry::Periodic(void)
 
     curr_v =  distance / delta_time;
 
-
+    frc::SmartDashboard::PutNumber("delta d",  distance  );
+    frc::SmartDashboard::PutNumber("delta t",  delta_time );
 
     //Update parameters for next run
     prev_left_enc  = left_enc;

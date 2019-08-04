@@ -27,7 +27,7 @@ public:
     void InitDefaultCommand() override;
 
     //Our Functions
-    void    Periodic(void);
+    void    OdometryPeriodic(void);
     void    Reset(void);
 
     double  GetX(void); //inches
