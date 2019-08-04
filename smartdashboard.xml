@@ -1,5 +1,14 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Curr_Vel" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="212" y="151"/>
+	</widget>
+	<widget field="Curr_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="219" y="124"/>
+	</widget>
+	<widget field="Curr_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="219" y="100"/>
+	</widget>
 	<widget field="navx_Yaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="298" y="216"/>
 	</widget>
@@ -20,9 +29,6 @@
 	</widget>
 	<widget field="navx_IsConn" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="282" y="288"/>
-	</widget>
-	<widget field="Timer" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="49" y="436"/>
 	</widget>
 	<widget field="D_L_Y_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="430" y="129"/>
@@ -45,11 +51,11 @@
 	<widget field="D_R_Y_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="588" y="129"/>
 	</widget>
-	<widget field="FPGATime2" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="24" y="458"/>
-	</widget>
 </dashboard>
 <live-window>
+	<widget field="Odometry" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<location x="0" y="60"/>
+	</widget>
 	<widget field="ExampleSubsystem" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
 		<location x="0" y="37"/>
 	</widget>

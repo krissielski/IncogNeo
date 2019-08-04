@@ -93,12 +93,12 @@ double Drivetrain::GetLeftMotor(void)
 int Drivetrain::GetLeftEncoder(void)
 {
 	//return leftEncoder->GetRaw();
-	return int( (Robot::m_timer->GetFPGATimestamp() - encsim_time) * ENC_TICKS_PER_INCH );
+	return int(  (Robot::m_timer->GetFPGATimestamp() - encsim_time) * ENC_TICKS_PER_INCH * 12.0);
 }
 int Drivetrain::GetRightEncoder(void)
 {
 	//return rightEncoder->GetRaw();
-	return int( (Robot::m_timer->GetFPGATimestamp() - encsim_time) * ENC_TICKS_PER_INCH );
+	return int( (Robot::m_timer->GetFPGATimestamp() - encsim_time) * ENC_TICKS_PER_INCH * 12.0 );
 }
 
 void Drivetrain::ResetEncoders(void)

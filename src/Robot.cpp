@@ -14,6 +14,8 @@
 //Subsystem Instantiation
 OI *Robot::m_oi;
 Drivetrain *Robot::m_drivetrain;
+Odometry   *Robot::m_odometry;
+
 
 frc::Timer *Robot::m_timer;
 
@@ -30,13 +32,15 @@ void Robot::RobotInit() {
 
 
     //******Subsystems******
-    m_drivetrain      = new Drivetrain();
+    m_drivetrain    = new Drivetrain();
+    m_odometry      = new Odometry();
 
     //OI **MUST** be after all subsystem constructors
     m_oi = new OI();
     m_timer = new frc::Timer();
 
     //Subsystem Inits
+    m_odometry->Reset();
 
 
 }
@@ -44,6 +48,9 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() 
 {
     //m_drivetrain->DriveWithGamepad(); 
+
+    m_odometry->Periodic();
+
     Write2Dashboard();
 }
 
@@ -55,7 +62,7 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic() 
 { 
-    //Write2Dashboard();
+
 }
 
 
@@ -76,6 +83,7 @@ void Robot::TeleopInit() {
     std::cout<<"Teleop Init"<<std::endl;
 
     m_drivetrain->ResetEncoders();
+    m_odometry->Reset();
 
 }
 
@@ -113,10 +121,14 @@ void Write2Dashboard(void)
  
     frc::SmartDashboard::PutNumber("navx_Rate",    Robot::m_drivetrain->GetGyroRate() );
 
+    frc::SmartDashboard::PutNumber("Curr_X",    Robot::m_odometry->GetX() );
+    frc::SmartDashboard::PutNumber("Curr_Y",    Robot::m_odometry->GetY() );
+    frc::SmartDashboard::PutNumber("Curr_Vel",  Robot::m_odometry->GetVel() );
 
 
     //Time
     //frc::SmartDashboard::PutNumber("FPGATime2",  Robot::m_timer->GetFPGATimestamp() );   //(double) sec
     //frc::SmartDashboard::PutNumber("Timer",      Robot::m_timer->Get() );                //Manual Timer sec
+
 
 }

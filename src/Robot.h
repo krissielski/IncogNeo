@@ -15,6 +15,7 @@
 
 //Subsystems
 #include "subsystems/Drivetrain.h"
+#include "subsystems/Odometry.h"
 
 
 #include <iostream>	
@@ -24,6 +25,7 @@ class Robot : public frc::TimedRobot {
     //Subsystems
     static OI *m_oi;
     static Drivetrain *m_drivetrain;
+    static Odometry   *m_odometry;
 
     static frc::Timer *m_timer;
 
