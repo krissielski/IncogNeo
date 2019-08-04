@@ -11,12 +11,12 @@
 OI::OI() 
 {
     //Init Gamepad
-    gamepad = new frc::Joystick(0);
+    drivergamepad = new frc::Joystick(0);
 
 
 }
 
 
-frc::Joystick* OI::GetGamepad() {
-  return gamepad;
+frc::Joystick* OI::GetDriverGamepad() {
+  return drivergamepad;
 }

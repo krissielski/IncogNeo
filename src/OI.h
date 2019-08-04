@@ -10,10 +10,10 @@
 class OI 
 {
 private:
-    frc::Joystick *gamepad;
+    frc::Joystick *drivergamepad;
 
 public:
     OI();
-    frc::Joystick* GetGamepad();
+    frc::Joystick* GetDriverGamepad();
 
 };

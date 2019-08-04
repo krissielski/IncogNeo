@@ -11,25 +11,45 @@
 #include "frc/WPILib.h"
 
 class Drivetrain : public frc::Subsystem {
- private:
-  // It's desirable that everything possible under private except
-  // for methods that implement subsystem capabilities
+private:
+
+    //Components
+    frc::SpeedController    *leftMotor;
+    frc::SpeedController    *rightMotor;
+    frc::DifferentialDrive  *differentialDrive;
+
+    frc::Encoder            *rightEncoder;
+    frc::Encoder            *leftEncoder;    
+
+    double encsim_time;
+    
+public:
+    Drivetrain();
+    void InitDefaultCommand() override;
+
+    //Drivetrain Constants
+    const static double ENC_TICKS_PER_INCH;
+
+    //Our Functions
 
 
-  frc::SpeedController    *leftMotor;
-  frc::SpeedController    *rightMotor;
-  frc::DifferentialDrive  *differentialDrive;
+    //Drive
+    void   DriveWithGamepad( void );
+    void   Drive( double left, double right );
+    void   Stop( void );
+    double GetRightMotor(void);
+    double GetLeftMotor(void);
 
- public:
-  Drivetrain();
-  void InitDefaultCommand() override;
-
-  //Our Functions
-
-
-  //Drive
-  void   DriveWithGamepad( void );
-  void   Drive( double left, double right );
-  void   Stop( void );
+    //Encoders
+	int  GetLeftEncoder(void);
+	int  GetRightEncoder(void);
+	void ResetEncoders(void);
+    
+    //NavX
+	bool   IsGyroConnected(void);
+	double GetGyroYaw(void);            //yaw: Relative -180 to +180
+	double GetGyroAngle(void);          //angle: absolute -inf to +inf
+	double GetGyroRate(void);
+	void   ZeroGyro(void);
 
 };

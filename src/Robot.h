@@ -25,6 +25,8 @@ class Robot : public frc::TimedRobot {
     static OI *m_oi;
     static Drivetrain *m_drivetrain;
 
+    static frc::Timer *m_timer;
+
     void RobotInit() override;
     void RobotPeriodic() override;
     void DisabledInit() override;
@@ -34,6 +36,8 @@ class Robot : public frc::TimedRobot {
     void TeleopInit() override;
     void TeleopPeriodic() override;
     void TestPeriodic() override;
+
+
 
  private:
 
