@@ -1,5 +1,14 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="CmdRunPurePursuit" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="16" y="254"/>
+	</widget>
+	<widget field="delta t" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="61"/>
+	</widget>
+	<widget field="delta d" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="40"/>
+	</widget>
 	<widget field="Curr_Vel" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="212" y="151"/>
 	</widget>
@@ -51,13 +60,16 @@
 	<widget field="D_R_Y_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="588" y="129"/>
 	</widget>
+	<widget field="period" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="16" y="19"/>
+	</widget>
 </dashboard>
 <live-window>
-	<widget field="Odometry" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
-		<location x="0" y="60"/>
+	<widget field="Drivetrain" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<location x="15" y="18"/>
 	</widget>
-	<widget field="ExampleSubsystem" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
-		<location x="0" y="37"/>
+	<widget field="Odometry" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<location x="5" y="24"/>
 	</widget>
 	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
 		<widget field="Spark[1]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
@@ -80,13 +92,9 @@
 			<height>97</height>
 			<width>297</width>
 		</widget>
-		<location x="27" y="26"/>
+		<location x="26" y="16"/>
 		<width>309</width>
 		<height>306</height>
 	</widget>
-	<widget field="Drivetrain" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
-		<location x="10" y="14"/>
-	</widget>
 </live-window>
-	<hidden field="Auto Modes"/>
 </xml>

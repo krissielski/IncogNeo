@@ -7,24 +7,26 @@
 
 #pragma once
 
-#include <frc/commands/Subsystem.h>
 
-class Odometry : public frc::Subsystem {
+class Odometry
+{
 private:
 
-    int    prev_left_enc;
-    int    prev_right_enc;
-    double prev_timestamp;
+    int    m_prev_left_enc;
+    int    m_prev_right_enc;
+    double m_prev_timestamp;
 
-    double curr_x;  //inches
-    double curr_y;  //inches
-    double curr_v;  //inches/sec
+    double m_curr_x;  //inches
+    double m_curr_y;  //inches
+    double m_curr_v;  //inches/sec
+    double m_curr_Lv;
+    double m_curr_Rv;
 
 
 
 public:
     Odometry();
-    void InitDefaultCommand() override;
+
 
     //Our Functions
     void    OdometryPeriodic(void);
@@ -33,9 +35,9 @@ public:
     double  GetX(void); //inches
     double  GetY(void);
     double  GetVel(void); //in/sec
+    double  GetLVel(void); //in/sec
+    double  GetRVel(void); //in/sec
 
-    
-
-
+    double  GetHeading(void); //degrees
 
 };

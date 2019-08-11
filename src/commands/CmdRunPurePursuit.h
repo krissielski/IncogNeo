@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "OI.h"
+#pragma once
 
-#include "commands/CmdRunPurePursuit.h"
+#include <frc/commands/Command.h>
+#include "util/PurePursuit.h"
 
-OI::OI() 
-{
-    //Init Gamepad
-    drivergamepad = new frc::Joystick(0);
+class CmdRunPurePursuit : public frc::Command {
+ public:
+  CmdRunPurePursuit( std::string  profile_filename );
+  void Initialize() override;
+  void Execute() override;
+  bool IsFinished() override;
+  void End() override;
+  void Interrupted() override;
 
-    //SmartDashboard buttons
-
-    frc::SmartDashboard::PutData("CmdRunPurePursuit", new CmdRunPurePursuit( "output.csv") );
-}
-
-frc::Joystick* OI::GetDriverGamepad() {
-  return drivergamepad;
-}
+ private:
+  PurePursuit *pp;
+};

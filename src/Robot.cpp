@@ -7,9 +7,11 @@
 
 #include "Robot.h"
 #include "GamepadMap.h"
+#include "util/PurePursuit.h"
 
 #include <frc/commands/Scheduler.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+
 
 //Subsystem Instantiation
 OI *Robot::m_oi;
@@ -48,7 +50,7 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() 
 {
     //m_drivetrain->DriveWithGamepad(); 
-
+    m_drivetrain->DrivetrainPeriodic();
     m_odometry->OdometryPeriodic();
 
     Write2Dashboard();
@@ -132,6 +134,7 @@ void Write2Dashboard(void)
 
     //Time
     //frc::SmartDashboard::PutNumber("FPGATime2",  Robot::m_timer->GetFPGATimestamp() );   //(double) sec
+    //frc::SmartDashboard::PutNumber("FPGATime1",  frc::Timer::GetFPGATimestamp() );   //(double) sec
     //frc::SmartDashboard::PutNumber("Timer",      Robot::m_timer->Get() );                //Manual Timer sec
 
 

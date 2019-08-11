@@ -21,8 +21,18 @@ private:
     frc::Encoder            *rightEncoder;
     frc::Encoder            *leftEncoder;    
 
-    double encsim_time;
     
+    //** DRIVETRAIN SIMULATION **
+    double m_Ldrive;
+    double m_Rdrive;
+    int    m_Lencoder;
+    int    m_Rencoder;    
+    double m_sim_Lvelocity;
+    double m_sim_Rvelocity;
+    double m_sim_distance;
+    double m_sim_Lencoder;
+    double m_sim_Rencoder;    
+
 public:
     Drivetrain();
     void InitDefaultCommand() override;
@@ -31,6 +41,7 @@ public:
     const static double ENC_TICKS_PER_INCH;
 
     //Our Functions
+    void DrivetrainPeriodic(void);
 
 
     //Drive

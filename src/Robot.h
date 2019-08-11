@@ -19,6 +19,7 @@
 
 
 #include <iostream>	
+#include <string>
 
 class Robot : public frc::TimedRobot {
  public:
