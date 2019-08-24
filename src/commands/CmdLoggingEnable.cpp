@@ -5,22 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "OI.h"
+#include "CmdLoggingEnable.h"
+#include "Robot.h"
 
-#include "commands/CmdRunPurePursuit.h"
-#include "commands/GrpVelocityRampTest.h"
-
-OI::OI() 
-{
-    //Init Gamepad
-    drivergamepad = new frc::Joystick(0);
-
-    //SmartDashboard buttons
-
-    frc::SmartDashboard::PutData("CmdRunPurePursuit",   new CmdRunPurePursuit( "output.csv") );
-    frc::SmartDashboard::PutData("GrpVelocityRampTest", new GrpVelocityRampTest( ) );
+CmdLoggingEnable::CmdLoggingEnable(bool enable) {
+  m_enable = enable;
 }
 
-frc::Joystick* OI::GetDriverGamepad() {
-  return drivergamepad;
+// Called once when the command executes
+void CmdLoggingEnable::Initialize() 
+{
+  Robot::m_logfile->LogFileEnable(m_enable);
 }

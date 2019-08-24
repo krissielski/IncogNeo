@@ -15,7 +15,7 @@
 //Drivetrain Constants
 const double Drivetrain::ENC_TICKS_PER_INCH = 40.0;
 
-#define MAX_DRIVE       1.0
+#define MAX_DRIVE       0.95
 
 
 Drivetrain::Drivetrain() : Subsystem("Drivetrain") 
@@ -27,6 +27,8 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 	rightEncoder      = new frc::Encoder(0, 1, true , frc::Encoder::k4X);
 	leftEncoder       = new frc::Encoder(2, 3, false, frc::Encoder::k4X);
 
+	//Turn motor Safety off (!)
+	differentialDrive->SetSafetyEnabled(false);
 
 	//Simulation
 	std::cout<<"Drivetrain: Warning - simulated drivetrain"<<std::endl;
@@ -105,6 +107,11 @@ void Drivetrain::DrivetrainPeriodic(void)
     // std::cout<< "dt Enc   = " << m_Lencoder <<" "<< m_Rencoder << std::endl;
 
 }
+
+//Mentor drive limiter
+#define MAX_DRIVE_POWER		0.8
+#define MAX_TURN_POWER		0.8
+
 //**************************************************************
 void Drivetrain::DriveWithGamepad( void )
 {
@@ -123,11 +130,17 @@ void Drivetrain::DriveWithGamepad( void )
 	if (fabs(xR)<= DEADBAND) xR = 0;
 
 
-	//TankDrive
-  	differentialDrive->TankDrive( yL,  yR,  false);
+
+
+	// //TankDrive
+	// yL *= MAX_DRIVE_POWER;	
+	// yR *= MAX_DRIVE_POWER;	
+  	// differentialDrive->TankDrive( yL,  yR,  false);
 
 	//Arcade Drive
-	//differentialDrive->ArcadeDrive(yL,-xR,  true);
+	yL *= MAX_DRIVE_POWER;
+	xR *= MAX_TURN_POWER;
+	differentialDrive->ArcadeDrive(yL,-xR,  true);
 
 }
 
@@ -144,8 +157,8 @@ void Drivetrain::Drive( double left, double right )
     else                            m_Rdrive =  right;
 
 	//Neg=Fwd.   Pos=Rev
-	//differentialDrive->TankDrive( (-1.0)*left,  (-1.0)*right,  false);
-	differentialDrive->TankDrive(0.0, 0.0, false);
+	differentialDrive->TankDrive( (-1.0)*left,  (-1.0)*right,  false);
+	//differentialDrive->TankDrive(0.0, 0.0, false);
 }
 //**************************************************************
 void Drivetrain::Stop( void )
@@ -159,13 +172,13 @@ void Drivetrain::Stop( void )
 //**************************************************************
 double Drivetrain::GetRightMotor(void)
 {
-	//return rightMotor->Get();
-	return m_Ldrive;
+	return rightMotor->Get();
+	//return m_Ldrive;
 }
 double Drivetrain::GetLeftMotor(void)
 {
-	//return leftMotor->Get();
-	return m_Rdrive;
+	return leftMotor->Get();
+	//return m_Rdrive;
 }
 
 
@@ -175,13 +188,13 @@ double Drivetrain::GetLeftMotor(void)
 //**************** ENCODERS *********************
 int Drivetrain::GetLeftEncoder(void)
 {
-	//return leftEncoder->GetRaw();
-	return m_Lencoder;
+	return -leftEncoder->GetRaw();
+	//return m_Lencoder;
 }
 int Drivetrain::GetRightEncoder(void)
 {
-	//return rightEncoder->GetRaw();
-	return m_Rencoder;
+	return -rightEncoder->GetRaw();
+	//return m_Rencoder;
 }
 
 void Drivetrain::ResetEncoders(void)

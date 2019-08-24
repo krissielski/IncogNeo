@@ -5,22 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "OI.h"
+#pragma once
 
-#include "commands/CmdRunPurePursuit.h"
-#include "commands/GrpVelocityRampTest.h"
+#include <frc/commands/CommandGroup.h>
 
-OI::OI() 
-{
-    //Init Gamepad
-    drivergamepad = new frc::Joystick(0);
-
-    //SmartDashboard buttons
-
-    frc::SmartDashboard::PutData("CmdRunPurePursuit",   new CmdRunPurePursuit( "output.csv") );
-    frc::SmartDashboard::PutData("GrpVelocityRampTest", new GrpVelocityRampTest( ) );
-}
-
-frc::Joystick* OI::GetDriverGamepad() {
-  return drivergamepad;
-}
+class GrpVelocityRampTest : public frc::CommandGroup {
+ public:
+  GrpVelocityRampTest();
+};

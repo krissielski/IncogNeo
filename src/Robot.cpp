@@ -7,7 +7,8 @@
 
 #include "Robot.h"
 #include "GamepadMap.h"
-#include "util/PurePursuit.h"
+//#include "util/PurePursuit.h"
+
 
 #include <frc/commands/Scheduler.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -17,6 +18,8 @@
 OI *Robot::m_oi;
 Drivetrain *Robot::m_drivetrain;
 Odometry   *Robot::m_odometry;
+
+LogFile    *Robot::m_logfile;
 
 
 frc::Timer *Robot::m_timer;
@@ -37,6 +40,8 @@ void Robot::RobotInit() {
     m_drivetrain    = new Drivetrain();
     m_odometry      = new Odometry();
 
+    m_logfile       = new LogFile();
+
     //OI **MUST** be after all subsystem constructors
     m_oi = new OI();
     m_timer = new frc::Timer();
@@ -52,6 +57,7 @@ void Robot::RobotPeriodic()
     //m_drivetrain->DriveWithGamepad(); 
     m_drivetrain->DrivetrainPeriodic();
     m_odometry->OdometryPeriodic();
+    m_logfile->LogFilePeriodic();
 
     Write2Dashboard();
 }
@@ -60,6 +66,8 @@ void Robot::RobotPeriodic()
 void Robot::DisabledInit() 
 {
     std::cout<<"Disabled Init"<<std::endl;
+
+    m_logfile->LogFileEnable(false);
 }
 
 void Robot::DisabledPeriodic() 
@@ -136,8 +144,6 @@ void Write2Dashboard(void)
     //frc::SmartDashboard::PutNumber("FPGATime2",  Robot::m_timer->GetFPGATimestamp() );   //(double) sec
     //frc::SmartDashboard::PutNumber("FPGATime1",  frc::Timer::GetFPGATimestamp() );   //(double) sec
     //frc::SmartDashboard::PutNumber("Timer",      Robot::m_timer->Get() );                //Manual Timer sec
-
-
 
 
 }

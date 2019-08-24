@@ -17,6 +17,8 @@
 #include "subsystems/Drivetrain.h"
 #include "subsystems/Odometry.h"
 
+//LogFile
+#include "util/LogFile.h"
 
 #include <iostream>	
 #include <string>
@@ -29,6 +31,8 @@ class Robot : public frc::TimedRobot {
     static Odometry   *m_odometry;
 
     static frc::Timer *m_timer;
+
+    static LogFile    *m_logfile;
 
     void RobotInit() override;
     void RobotPeriodic() override;
