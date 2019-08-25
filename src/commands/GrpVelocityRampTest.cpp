@@ -8,6 +8,7 @@
 #include "commands/GrpVelocityRampTest.h"
 
 #include "commands/CmdDriveManual.h"
+#include "commands/CmdDriveVelRampTest.h"
 #include "commands/CmdPrintAutoText.h"
 #include "commands/CmdDriveFwdEncoder.h"
 #include "commands/CmdDriveFwdGyro.h"
@@ -24,10 +25,10 @@ GrpVelocityRampTest::GrpVelocityRampTest()
     AddSequential(new CmdLoggingEnable(true));
 
 
-    AddSequential(new CmdDriveManual(0.7,  0.7,  3.0 )  );
+    AddSequential(new CmdDriveVelRampTest());
 
 
-    AddSequential(new frc::WaitCommand(2.0));           //Let it finish whatever it's doing
+    AddSequential(new frc::WaitCommand(1.0));           //Let it finish whatever it's doing
     AddSequential(new CmdLoggingEnable(false));
     //***************************************************
     AddSequential(new CmdDriveManual(0,0,0) );          //Safety.  All Off

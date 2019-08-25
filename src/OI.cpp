@@ -9,6 +9,7 @@
 
 #include "commands/CmdRunPurePursuit.h"
 #include "commands/GrpVelocityRampTest.h"
+#include "commands/CmdDriveClearAll.h"
 
 OI::OI() 
 {
@@ -16,9 +17,10 @@ OI::OI()
     drivergamepad = new frc::Joystick(0);
 
     //SmartDashboard buttons
-
+    frc::SmartDashboard::PutData("CmdDriveClearAll",    new CmdDriveClearAll( ) );
     frc::SmartDashboard::PutData("CmdRunPurePursuit",   new CmdRunPurePursuit( "output.csv") );
     frc::SmartDashboard::PutData("GrpVelocityRampTest", new GrpVelocityRampTest( ) );
+
 }
 
 frc::Joystick* OI::GetDriverGamepad() {

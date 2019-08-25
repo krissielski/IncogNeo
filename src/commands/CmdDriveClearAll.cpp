@@ -13,5 +13,6 @@ void CmdDriveClearAll::Initialize()
     //Use at the start of Auto to clear/reset all drivetrain parameters
     Robot::m_drivetrain->ResetEncoders();
     Robot::m_drivetrain->ZeroGyro();
+    Robot::m_odometry->Reset();
 
 }

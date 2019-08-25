@@ -14,7 +14,6 @@
 Odometry::Odometry()
 {
     std::cout<<"In Odometry"<<std::endl;
-    std::cout<<"Odometry: Warning - simulated timestamp"<<std::endl;
 
     Reset();
 
@@ -43,9 +42,8 @@ void Odometry::OdometryPeriodic(void)
     int left_enc  = Robot::m_drivetrain->GetLeftEncoder();
     int right_enc = Robot::m_drivetrain->GetRightEncoder();
 
-    //SIMULATED TIMESTAMP
-    //double timestamp = Robot::m_timer->GetFPGATimestamp();
-    double timestamp = m_prev_timestamp + 0.020;  //20ms
+    // TIMESTAMP
+    double timestamp = Robot::m_timer->GetFPGATimestamp();
 
 
     int delta_left_enc  = ( left_enc  - m_prev_left_enc);
@@ -66,18 +64,11 @@ void Odometry::OdometryPeriodic(void)
     m_curr_Lv =  delta_left_enc /(Robot::m_drivetrain->ENC_TICKS_PER_INCH*delta_time);
     m_curr_Rv =  delta_right_enc/(Robot::m_drivetrain->ENC_TICKS_PER_INCH*delta_time);
 
-    //frc::SmartDashboard::PutNumber("delta d",  distance  );
-    //frc::SmartDashboard::PutNumber("delta t",  delta_time );
 
     //Update parameters for next run
     m_prev_left_enc  = left_enc;
     m_prev_right_enc = right_enc;
     m_prev_timestamp = timestamp;
-
-
-    // std::cout<< "od coord = " << m_curr_x <<" "<< m_curr_y << std::endl;
-    // std::cout<< "od Vel   = " << m_curr_Lv <<" "<< m_curr_Rv << std::endl;
-
 
 }
 

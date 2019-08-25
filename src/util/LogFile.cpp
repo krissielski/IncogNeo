@@ -34,22 +34,26 @@ void LogFile::LogFilePeriodic( void )
     if( !logfile.is_open() ) return;
 
 
-    //Gather some data 
+    //Calculate delta time
     double curr_time = frc::Timer::GetFPGATimestamp() - m_logStartTime;
-    //double curr_x    = Robot::m_odometry->GetX();
-    //double curr_y    = Robot::m_odometry->GetY();
+
 
     logfile << std::fixed << std::setprecision(3);
 
-    logfile << curr_time                                 << ","; // 1:  ms since start
+    logfile << curr_time                                << ","; // 1:  ms since start
    
     logfile << Robot::m_drivetrain->GetGyroAngle()      << ","; // 4:  Yaw
     logfile << Robot::m_drivetrain->GetLeftMotor()      << ","; // 5:  LeftMotor
     logfile << Robot::m_drivetrain->GetRightMotor()     << ","; // 6:  RightMotor
     logfile << Robot::m_drivetrain->GetLeftEncoder()    << ","; // 7:  Left Encoder
     logfile << Robot::m_drivetrain->GetRightEncoder()   << ","; // 8:  Right Encoder
-//    logfile << Robot::m_drivetrain->GetLeftEncVel()     << ","; // 9:  Left Encoder Velocity
-//    logfile << Robot::m_drivetrain->GetRightEncVel()    << ","; // 10: Right Encoder Velocity
+    //Odometry
+    logfile << Robot::m_odometry->GetX()                << ","; // 9:
+    logfile << Robot::m_odometry->GetY()                << ","; //10:
+    logfile << Robot::m_odometry->GetVel()              << ","; //11:
+    logfile << Robot::m_odometry->GetRVel()             << ","; //12:
+    logfile << Robot::m_odometry->GetLVel()             << ","; //13:
+
 
 
     //Must be last
@@ -112,8 +116,12 @@ void LogFile::LogfileOpen(void)
         logfile << "RMotor"     << ","; // 6:  RightMotor
         logfile << "LEnc"       << ","; // 7:  Left Encoder
         logfile << "REnc"       << ","; // 8:  Right Encoder
-        logfile << "LEncV"      << ","; // 9:  Left Encoder Velocity
-        logfile << "REncV"      << ","; // 10: Right Encoder Velocity
+
+        logfile << "X"          << ","; // 9:  Right Encoder
+        logfile << "Y"          << ","; //10:  Right Encoder
+        logfile << "Vel"        << ","; //11:  Right Encoder
+        logfile << "LEncV"      << ","; //12:  Left Encoder Velocity
+        logfile << "REncV"      << ","; //13: Right Encoder Velocity
 
         //Must be last
         logfile << "\n";

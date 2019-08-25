@@ -13,7 +13,7 @@
 
 
 //Drivetrain Constants
-const double Drivetrain::ENC_TICKS_PER_INCH = 40.0;
+const double Drivetrain::ENC_TICKS_PER_INCH = 41.9;		//Calibrated IncogSparks 8/25/19
 
 #define MAX_DRIVE       0.95
 
@@ -110,7 +110,7 @@ void Drivetrain::DrivetrainPeriodic(void)
 
 //Mentor drive limiter
 #define MAX_DRIVE_POWER		0.8
-#define MAX_TURN_POWER		0.8
+#define MAX_TURN_POWER		0.95
 
 //**************************************************************
 void Drivetrain::DriveWithGamepad( void )

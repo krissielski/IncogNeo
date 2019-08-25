@@ -1,7 +1,22 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="VRTest_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="97" y="343"/>
+		<width>103</width>
+		<height>20</height>
+	</widget>
+	<widget field="VRTest_Time" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="103" y="365"/>
+		<width>96</width>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="310" y="3"/>
+	</static-widget>
+	<widget field="CmdDriveClearAll" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="27" y="206"/>
+	</widget>
 	<widget field="GrpVelocityRampTest" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
-		<location x="8" y="281"/>
+		<location x="9" y="311"/>
 	</widget>
 	<widget field="CmdRunPurePursuit" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
 		<location x="16" y="254"/>
@@ -57,13 +72,35 @@
 	<widget field="D_R_Y_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="588" y="129"/>
 	</widget>
-	<widget field="FPGATime2" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="9" y="383"/>
-	</widget>
-	<widget field="FPGATime1" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="8" y="360"/>
-	</widget>
 </dashboard>
 <live-window>
+	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<widget field="Spark[1]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
+			<location x="6" y="16"/>
+			<height>45</height>
+			<width>297</width>
+		</widget>
+		<widget field="Spark[0]" type="Speed Controller" class="edu.wpi.first.smartdashboard.livewindow.elements.SpeedController">
+			<location x="6" y="61"/>
+			<height>45</height>
+			<width>297</width>
+		</widget>
+		<widget field="Encoder[2]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="106"/>
+			<height>97</height>
+			<width>297</width>
+		</widget>
+		<widget field="Encoder[0]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="203"/>
+			<height>97</height>
+			<width>297</width>
+		</widget>
+		<location x="0" y="23"/>
+		<width>309</width>
+		<height>306</height>
+	</widget>
+	<widget field="Drivetrain" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<location x="0" y="0"/>
+	</widget>
 </live-window>
 </xml>
