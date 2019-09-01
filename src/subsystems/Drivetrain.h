@@ -9,6 +9,7 @@
 
 #include <frc/commands/Subsystem.h>
 #include "frc/WPILib.h"
+#include "AHRS.h"
 
 class Drivetrain : public frc::Subsystem {
 private:
@@ -21,17 +22,9 @@ private:
     frc::Encoder            *rightEncoder;
     frc::Encoder            *leftEncoder;    
 
-    
-    //** DRIVETRAIN SIMULATION **
-    double m_Ldrive;
-    double m_Rdrive;
-    int    m_Lencoder;
-    int    m_Rencoder;    
-    double m_sim_Lvelocity;
-    double m_sim_Rvelocity;
-    double m_sim_distance;
-    double m_sim_Lencoder;
-    double m_sim_Rencoder;    
+    AHRS *ahrs;	    //NavX
+
+
 
 public:
     Drivetrain();

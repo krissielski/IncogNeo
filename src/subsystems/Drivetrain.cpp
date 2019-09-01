@@ -27,22 +27,11 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 	rightEncoder      = new frc::Encoder(0, 1, true , frc::Encoder::k4X);
 	leftEncoder       = new frc::Encoder(2, 3, false, frc::Encoder::k4X);
 
+	ahrs  			  = new AHRS(SPI::Port::kMXP);
+
 	//Turn motor Safety off (!)
 	differentialDrive->SetSafetyEnabled(false);
 
-	//Simulation
-	std::cout<<"Drivetrain: Warning - simulated drivetrain"<<std::endl;
-    m_Ldrive = 0;
-    m_Rdrive = 0;
-
-    m_Lencoder = 0;
-    m_Rencoder = 0;
-
-    m_sim_Lvelocity = 0;
-    m_sim_Rvelocity = 0;
-    m_sim_distance = 0;
-    m_sim_Lencoder = 0;
-    m_sim_Rencoder = 0;
 
 }
 
@@ -55,57 +44,10 @@ void Drivetrain::InitDefaultCommand() {
 // here. Call these from Commands.
 
 
-//Simulation constants
-#define PROFILE_RATE    50                              //hertz
-#define PROFILE_PERIOD  (1/PROFILE_RATE)                //seconds
-
-#define MAX_ACCEL_RATE  200                             //inches per second per second
-#define MAX_ACCEL_TICK  (MAX_ACCEL_RATE/PROFILE_RATE)   //inches per second per tick
-
 //**************************************************************
 void Drivetrain::DrivetrainPeriodic(void)
 {
 	
-    //Calc New Velocity....
-    double drive_Lv = fabs(m_Ldrive) >= 0.5 ?  (m_Ldrive-0.5)*200 : 0;
-    double drive_Rv = fabs(m_Rdrive) >= 0.5 ?  (m_Rdrive-0.5)*200 : 0;
-
-    double delta_Lv = drive_Lv - m_sim_Lvelocity;
-    double delta_Rv = drive_Rv - m_sim_Rvelocity;
-
-    double calc_Ldv = 0;
-    double calc_Rdv = 0;
-
-    if      ( delta_Lv < -MAX_ACCEL_TICK )  calc_Ldv = -MAX_ACCEL_TICK;
-    else if ( delta_Lv >  MAX_ACCEL_TICK )  calc_Ldv =  MAX_ACCEL_TICK;
-    else                                    calc_Ldv =  delta_Lv;
-
-    if      ( delta_Rv < -MAX_ACCEL_TICK )  calc_Rdv = -MAX_ACCEL_TICK;
-    else if ( delta_Rv >  MAX_ACCEL_TICK )  calc_Rdv =  MAX_ACCEL_TICK;
-    else                                    calc_Rdv =  delta_Rv;
-
-    m_sim_Lvelocity += (calc_Ldv);
-    m_sim_Rvelocity += (calc_Rdv);
-
-    m_sim_distance += (m_sim_Lvelocity + m_sim_Rvelocity)/(2*PROFILE_RATE) ;
-
-    m_sim_Lencoder += (m_sim_Lvelocity * ENC_TICKS_PER_INCH)/PROFILE_RATE;
-    m_sim_Rencoder += (m_sim_Rvelocity * ENC_TICKS_PER_INCH)/PROFILE_RATE;
-
-    //Encoders update based on velocity
-    m_Lencoder = (int)m_sim_Lencoder;
-    m_Rencoder = (int)m_sim_Rencoder;
-
-    // //**** DEBUG ****
-    // std::cout<< "dt drive = " << m_Ldrive <<" "<< m_Rdrive << std::endl;
-    // std::cout<< "dt drive = " << drive_Lv <<" "<< drive_Rv << std::endl;
-    // std::cout<< "dt calc  = " << calc_Ldv <<" "<< calc_Rdv << std::endl;
-    // std::cout<< "dt dist  = " << m_sim_distance  << std::endl;
-
-    // std::cout<< "dt Veloc = " << m_sim_Lvelocity <<" "<< m_sim_Rvelocity << std::endl;
-    // std::cout<< "dt Enc   = " << m_sim_Lencoder <<" "<< m_sim_Rencoder << std::endl;
-    // std::cout<< "dt Enc   = " << m_Lencoder <<" "<< m_Rencoder << std::endl;
-
 }
 
 //Mentor drive limiter
@@ -140,24 +82,24 @@ void Drivetrain::DriveWithGamepad( void )
 	//Arcade Drive
 	yL *= MAX_DRIVE_POWER;
 	xR *= MAX_TURN_POWER;
-	differentialDrive->ArcadeDrive(yL,-xR,  true);
+	differentialDrive->ArcadeDrive(yL,-xR,  false);
 
 }
 
 //**************************************************************
 void Drivetrain::Drive( double left, double right )
 {
+	double leftDrive  = left;
+	double rightDrive = right;
 
-    if      ( left < -MAX_DRIVE )  m_Ldrive = -MAX_DRIVE;
-    else if ( left >  MAX_DRIVE )  m_Ldrive =  MAX_DRIVE;
-    else                           m_Ldrive =  left;
+    if ( left < -MAX_DRIVE )  leftDrive = -MAX_DRIVE;
+    if ( left >  MAX_DRIVE )  leftDrive =  MAX_DRIVE;
 
-    if      ( right < -MAX_DRIVE )  m_Rdrive = -MAX_DRIVE;
-    else if ( right >  MAX_DRIVE )  m_Rdrive =  MAX_DRIVE;
-    else                            m_Rdrive =  right;
+    if ( right < -MAX_DRIVE )  rightDrive = -MAX_DRIVE;
+    if ( right >  MAX_DRIVE )  rightDrive =  MAX_DRIVE;
 
 	//Neg=Fwd.   Pos=Rev
-	differentialDrive->TankDrive( (-1.0)*left,  (-1.0)*right,  false);
+	differentialDrive->TankDrive( (-1.0)*leftDrive,  (-1.0)*rightDrive,  false);
 	//differentialDrive->TankDrive(0.0, 0.0, false);
 }
 //**************************************************************
@@ -165,20 +107,15 @@ void Drivetrain::Stop( void )
 {
 	differentialDrive->TankDrive(0.0, 0.0, false);
   	std::cout << "STOP!" << std::endl;
-
-	m_Ldrive = 0;
-	m_Rdrive = 0;
 }
 //**************************************************************
 double Drivetrain::GetRightMotor(void)
 {
 	return rightMotor->Get();
-	//return m_Ldrive;
 }
 double Drivetrain::GetLeftMotor(void)
 {
 	return leftMotor->Get();
-	//return m_Rdrive;
 }
 
 
@@ -189,21 +126,16 @@ double Drivetrain::GetLeftMotor(void)
 int Drivetrain::GetLeftEncoder(void)
 {
 	return -leftEncoder->GetRaw();
-	//return m_Lencoder;
 }
 int Drivetrain::GetRightEncoder(void)
 {
 	return -rightEncoder->GetRaw();
-	//return m_Rencoder;
 }
 
 void Drivetrain::ResetEncoders(void)
 {
 	leftEncoder->Reset();
 	rightEncoder->Reset();
-    m_Lencoder = 0;
-    m_Lencoder = 0;
-
 }
 
 
@@ -211,32 +143,26 @@ void Drivetrain::ResetEncoders(void)
 
 bool Drivetrain::IsGyroConnected(void)
 {
-	//return ahrs->IsConnected();
-	return true;
+	return ahrs->IsConnected();
 }
 double Drivetrain::GetGyroYaw(void)
 {
     //Returns Relative Yaw:  -180 to +180
-	//return (double) ahrs->GetYaw();
-	return 0.0;
+	return (double) ahrs->GetYaw();
 }
 double Drivetrain::GetGyroAngle(void)
 {
     //returns total accumulated angle -inf to +inf  (continuous through 360deg)
-	//return (double) ahrs->GetAngle();
-	return 0.0;
+	return (double) ahrs->GetAngle();
 }
-
-
 double Drivetrain::GetGyroRate(void)
 {
-	//return ahrs->GetRate();
-	return 0.0;
+	return ahrs->GetRate();
 }
 void Drivetrain::ZeroGyro(void)
 {
   	std::cout<<"ZeroGyro"<<std::endl;
-	//ahrs->ZeroYaw();
+	ahrs->ZeroYaw();
 	//**OR
 	//ahrs->Reset();//????
 }
