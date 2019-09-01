@@ -56,4 +56,5 @@ void CmdRunPurePursuit::End()
 void CmdRunPurePursuit::Interrupted() 
 {
         cout << "CmdRunPurePursuit Interrupted"<<endl;
+        pp->PurePursuitEnd();
 }

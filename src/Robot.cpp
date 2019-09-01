@@ -94,6 +94,7 @@ void Robot::TeleopInit() {
 
     m_drivetrain->ResetEncoders();
     m_odometry->Reset();
+    Robot::m_drivetrain->ZeroGyro();
 
 }
 

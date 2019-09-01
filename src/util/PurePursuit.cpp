@@ -24,7 +24,7 @@ using namespace std;
 
 //****** PARAMETERS WE NEED TO DEFINE
 #define LOOKAHEAD_DISTANCE      20.0          //inches (radius)
-#define ROBOT_TRACK_WIDTH       30
+#define ROBOT_TRACK_WIDTH       25
 
 const double PI = 3.14159;
 
@@ -238,9 +238,25 @@ void PurePursuit::PurePursuitPeriodic(void)
     double curr_Rv   = Robot::m_odometry->GetRVel();
 
 
-    double calcLdrive = target_Lv/200 + 0.5;
+    //Cheap Rate Limiter for now......
+    double target_Lv_adj,target_Rv_adj;
+    const double MAX_DELTA_V =  (200/50);
 
-    double calcRdrive = target_Rv/200 + 0.5;
+    if( (target_Lv - curr_Lv) > MAX_DELTA_V )   target_Lv_adj = curr_Lv + MAX_DELTA_V;
+    else target_Lv_adj = target_Lv;
+    
+    if( (target_Rv - curr_Rv) > MAX_DELTA_V )   target_Rv_adj = curr_Rv + MAX_DELTA_V;
+    else target_Rv_adj = target_Rv;
+
+
+    //double calcLdrive = 0.5;
+    //double calcRdrive = 0.5;
+
+
+    //GOOD ENOUGH FOR TESTING.  NEED BETTER LOGIC HERE!
+    double calcLdrive = target_Lv_adj/100.0 - 0.5;
+    double calcRdrive = target_Rv_adj/100.0 - 0.5;
+
 
 
     Robot::m_drivetrain->Drive(calcLdrive,calcRdrive);
@@ -248,15 +264,6 @@ void PurePursuit::PurePursuitPeriodic(void)
     //Lff, Rff
     //Lfb, Rfb
     //kV,  kA, kP
-
-
-    // //**** DEBUG ****
-    // std::cout<< "pp index = " << ppindex << std::endl;
-    // std::cout<< "pp la pt = " << lookahead_pt.x <<" "<< lookahead_pt.y << std::endl;
-    // std::cout<< "pp curve = " << curvature  << std::endl;
-    // std::cout<< "pp Veloc = " << target_Lv <<" "<< target_Rv << std::endl;
-
-    // std::cout<< "pp Drive = " << calcLdrive <<" "<< calcRdrive << std::endl;
 
     if( !m_logfile->is_open() ) return;
 
@@ -270,16 +277,17 @@ void PurePursuit::PurePursuitPeriodic(void)
 
     *m_logfile << std::fixed << std::setprecision(3);
 
-    *m_logfile << curr_time                                 << ","; // 4:  Yaw
-    *m_logfile << curr_x  <<" "<< curr_y                    << ","; // 5:  LeftMoto
-    *m_logfile << curr_Lv <<" "<< curr_Rv                   << ","; // 5:  LeftMoto
+    *m_logfile << curr_time                                 << ","; // 1:  Time
+    *m_logfile << curr_x  <<" "<< curr_y                    << ","; // 2:  X,Y
+    *m_logfile << Robot::m_drivetrain->GetGyroAngle()       << ","; // 3:  Yaw
+    *m_logfile << curr_Lv <<" "<< curr_Rv                   << ","; // 4:  Vel
 
 
-    *m_logfile << ppindex                                  << ","; // 4:  Yaw
-    *m_logfile <<  lookahead_pt.x <<" "<< lookahead_pt.y   << ","; // 5:  LeftMoto
-    *m_logfile << curvature                                << ","; // 4:  Yaw
-    *m_logfile << target_Lv  <<" "<< target_Rv             << ","; // 4:  Yaw
-    *m_logfile << calcLdrive <<" "<< calcRdrive            << ","; // 4:  Yaw
+    *m_logfile << ppindex                                  << ","; // 4:  index
+    *m_logfile <<  lookahead_pt.x <<" "<< lookahead_pt.y   << ","; // 5:  lookahead x,y
+    *m_logfile << curvature                                << ","; // 4:  curve
+    *m_logfile << target_Lv  <<" "<< target_Rv             << ","; // 4:  target vel
+    *m_logfile << calcLdrive <<" "<< calcRdrive            << ","; // 4:  calc drive
 
 
 
