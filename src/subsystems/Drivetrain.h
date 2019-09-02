@@ -56,4 +56,7 @@ public:
 	double GetGyroRate(void);
 	void   ZeroGyro(void);
 
+    //Robot Control
+    double V2P_calc( double velocity ); //velocity = inches/sec
+
 };

@@ -22,6 +22,10 @@ using namespace std;
 #define PATH_TO_LOGS    "/media/sda1/logs/"         //USB Drive
 #endif
 
+#define PINDENT "    "
+
+#define NUM_PPARAM  3                               //Number of parameters to read from each profile line
+
 //****** PARAMETERS WE NEED TO DEFINE
 #define LOOKAHEAD_DISTANCE      20.0          //inches (radius)
 #define ROBOT_TRACK_WIDTH       25
@@ -39,10 +43,7 @@ const double PI = 3.14159;
  *******************************/
 PurePursuit::PurePursuit( std::string profile_filename )
 {
-
-    cout<<"In Pure Pursuit" << endl;
-
-    cout<<"Filename: " << profile_filename <<  endl;
+    cout<<"PP Profile: " << profile_filename <<  endl;
 
     LoadProfile( profile_filename );
 
@@ -62,16 +63,15 @@ void PurePursuit::LoadProfile( std::string profile_filename )
     string   filename = PATH_TO_PROFILE + profile_filename;
     ifstream openfile;
     string   line;
+    bool     first_line = true;
 
     profile_point_t ppoint;
-
-    cout<<"Filename: " << filename <<  endl;
 
     openfile.open(filename, ifstream::in );
 
 	if( !openfile.is_open() )
     {
-        std::cout<<"*** Could NOT Open m_logfile!!!!" <<std::endl;
+        std::cout<< PINDENT << "*** Could not open profile!!!!" <<std::endl;
         return;
     }
 
@@ -86,18 +86,24 @@ void PurePursuit::LoadProfile( std::string profile_filename )
         //Are we are end of file?
         if(openfile.eof() )
         {
-
-            cout<<" Profile Imported, " << m_profile.size() << "Lines!" << endl;
-            cout<<" All Done!!!!"<<endl;
+            cout<< PINDENT << "Imported " << m_profile.size() << " lines" << endl;
             return;
+        }
+
+        //Check for first line: Comment line
+        if( first_line )
+        {
+            first_line = false;
+            cout<< PINDENT << line  << endl;
+            continue;
         }
 
         unsigned int line_index = 0;
         unsigned int col_index  = 0;
-        string results[6];
+        string results[NUM_PPARAM];
 
         //Read each character of the line and place in proper bin
-        while( (line_index < line.size() ) && (col_index<6) )
+        while( (line_index < line.size() ) && (col_index<NUM_PPARAM) )
         {
 
             if( line[line_index] == ',' )                   //if hit ','
@@ -112,33 +118,22 @@ void PurePursuit::LoadProfile( std::string profile_filename )
 
 
         //Sanity Check that we had the correct amount of data
-        if( col_index != 5)
+        if( col_index != (NUM_PPARAM-1) )
         {
-            cout << "Invalid Index Size!" << endl;
+            cout << PINDENT << "**** Invalid Index Size!" << endl;
             return;
         }
-
-        // cout << results[0] << " ";
-        // cout << results[1] << " ";
-        // cout << results[2] << " ";
-        // cout << results[3] << " ";
-        // cout << results[4] << " ";
-        // cout << results[5] << endl;
-
 
         //Use a try-block to insure we don't crash trying to convert strings to float
         try
         {
             ppoint.x          = (double)stof(results[0]);
             ppoint.y          = (double)stof(results[1]);
-            ppoint.distance   = (double)stof(results[2]);
-            ppoint.curvature  = (double)stof(results[3]);
-            ppoint.max_v      = (double)stof(results[4]);
-            ppoint.velocity   = (double)stof(results[5]);
+            ppoint.velocity   = (double)stof(results[2]);
         }
         catch(...)
         {
-            cout<<"Exception!! "<<endl;
+            cout<< PINDENT << "***** Exception!!" << endl;
             return;
         }
 
@@ -168,9 +163,6 @@ void PurePursuit::PrintProfile( void )
     {
         cout << m_profile[i].x << " ";
         cout << m_profile[i].y << " ";
-        cout << m_profile[i].distance << " ";
-        cout << m_profile[i].curvature << " ";
-        cout << m_profile[i].max_v << " ";
         cout << m_profile[i].velocity << " ";
         cout << endl;
     }
@@ -237,34 +229,28 @@ void PurePursuit::PurePursuitPeriodic(void)
     double curr_Lv   = Robot::m_odometry->GetLVel();
     double curr_Rv   = Robot::m_odometry->GetRVel();
 
-
-    //Cheap Rate Limiter for now......
-    double target_Lv_adj,target_Rv_adj;
-    const double MAX_DELTA_V =  (200/50);
-
-    if( (target_Lv - curr_Lv) > MAX_DELTA_V )   target_Lv_adj = curr_Lv + MAX_DELTA_V;
-    else target_Lv_adj = target_Lv;
-    
-    if( (target_Rv - curr_Rv) > MAX_DELTA_V )   target_Rv_adj = curr_Rv + MAX_DELTA_V;
-    else target_Rv_adj = target_Rv;
+    double curr_Lpow = Robot::m_drivetrain->GetLeftMotor();
+    double curr_Rpow = Robot::m_drivetrain->GetRightMotor();
 
 
-    //double calcLdrive = 0.5;
-    //double calcRdrive = 0.5;
+    //Get Power required for target velocity
+    double calcLdrive = Robot::m_drivetrain->V2P_calc(target_Lv);
+    double calcRdrive = Robot::m_drivetrain->V2P_calc(target_Rv);
 
+    //Cheap limiter by slowly ramping up power
+    const double limiter = 0.05;
+    calcLdrive += (calcLdrive - curr_Lpow) * limiter;
+    calcRdrive += (calcRdrive - curr_Rpow) * limiter;
 
-    //GOOD ENOUGH FOR TESTING.  NEED BETTER LOGIC HERE!
-    double calcLdrive = target_Lv_adj/100.0 - 0.5;
-    double calcRdrive = target_Rv_adj/100.0 - 0.5;
-
-
-
-    Robot::m_drivetrain->Drive(calcLdrive,calcRdrive);
-
+    // *** ToDo:
     //Lff, Rff
     //Lfb, Rfb
     //kV,  kA, kP
 
+    //Finally, write to drivetrain
+    Robot::m_drivetrain->Drive(calcLdrive,calcRdrive);
+
+    // *******   LOG FILE ********************************************
     if( !m_logfile->is_open() ) return;
 
 
@@ -281,7 +267,6 @@ void PurePursuit::PurePursuitPeriodic(void)
     *m_logfile << curr_x  <<" "<< curr_y                    << ","; // 2:  X,Y
     *m_logfile << Robot::m_drivetrain->GetGyroAngle()       << ","; // 3:  Yaw
     *m_logfile << curr_Lv <<" "<< curr_Rv                   << ","; // 4:  Vel
-
 
     *m_logfile << ppindex                                  << ","; // 4:  index
     *m_logfile <<  lookahead_pt.x <<" "<< lookahead_pt.y   << ","; // 5:  lookahead x,y

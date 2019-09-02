@@ -31,10 +31,7 @@ class PurePursuit
         {
             double x;           //[0]
             double y;           //[1]
-            double distance;    //[2]
-            double curvature;   //[3]
-            double max_v;       //[4]
-            double velocity;    //[5]
+            double velocity;    //[2]
         }profile_point_t;
 
         //THE PROFILE VECTOR
