@@ -41,20 +41,31 @@ void CmdRunPurePursuit::Execute()
 // Make this return true when this Command no longer needs to run execute()
 bool CmdRunPurePursuit::IsFinished() 
 { 
-    pp->PurePursuitIsDone(); 
+    if( pp->PurePursuitIsDone() )
+    {
+       cout << " Path at end"<<endl;
+       return true;
+    }
+    if( pp->PurePursuitIsError() )
+    {
+        cout << " ** ABORT **  Path Error!"<<endl;
+        return true;
+    }
+    return false;
 }
 
 // Called once after isFinished returns true
 void CmdRunPurePursuit::End() 
 {
-        cout << "CmdRunPurePursuit END"<<endl;
-        pp->PurePursuitEnd();
+    cout << "CmdRunPurePursuit END"<<endl;
+    Robot::m_drivetrain->Stop();
+    pp->PurePursuitEnd();
 }
 
 // Called when another command which requires one or more of the same
 // subsystems is scheduled to run
 void CmdRunPurePursuit::Interrupted() 
 {
-        cout << "CmdRunPurePursuit Interrupted"<<endl;
-        pp->PurePursuitEnd();
+    cout << "CmdRunPurePursuit Interrupted"<<endl;
+    End();
 }

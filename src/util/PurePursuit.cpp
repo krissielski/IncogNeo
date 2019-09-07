@@ -28,7 +28,7 @@ using namespace std;
 
 //****** PARAMETERS WE NEED TO DEFINE
 #define LOOKAHEAD_DISTANCE      20.0          //inches (radius)
-#define ROBOT_TRACK_WIDTH       25
+#define ROBOT_TRACK_WIDTH       32
 
 const double PI = 3.14159;
 
@@ -48,7 +48,8 @@ PurePursuit::PurePursuit( std::string profile_filename )
     LoadProfile( profile_filename );
 
     //Init
-    m_isPathDone = false;
+    m_isPathDone  = false;
+    m_isPathError = false;
     m_logfile = new std::ofstream();
 
 }
@@ -197,6 +198,13 @@ bool PurePursuit::PurePursuitIsDone(void)
 {
     return m_isPathDone;
 }
+/*******************************
+ ** PurePursuitIsError
+ *******************************/
+bool PurePursuit::PurePursuitIsError(void)
+{
+    return m_isPathError;
+}
 
 
 /*******************************
@@ -207,16 +215,20 @@ void PurePursuit::PurePursuitPeriodic(void)
 {
 
     //Sanity Check
-    if( m_isPathDone )
+    if( m_isPathDone || m_isPathError )
     {
-        //Path done.  Don't do anymore
-        Robot::m_drivetrain->Stop();
+        //Path done or is and error.  Exit immediately
         return;
     }
 
     //Running Pure Pursuit Algorithm
     unsigned int ppindex = FindClosestPoint();
+
     coord_t lookahead_pt = FindLookaheadPoint();
+
+    //Check to see if we left path
+    if( m_isPathError  ) return;
+    
     double curvature     = CalcCurvature(lookahead_pt );
 
 
@@ -229,8 +241,10 @@ void PurePursuit::PurePursuitPeriodic(void)
     double curr_Lv   = Robot::m_odometry->GetLVel();
     double curr_Rv   = Robot::m_odometry->GetRVel();
 
-    double curr_Lpow = Robot::m_drivetrain->GetLeftMotor();
-    double curr_Rpow = Robot::m_drivetrain->GetRightMotor();
+    //double curr_Lpow = Robot::m_drivetrain->GetLeftMotor();
+    //double curr_Rpow = Robot::m_drivetrain->GetRightMotor();
+    static double curr_Lpow = 0;
+    static double curr_Rpow = 0;
 
 
     //Get Power required for target velocity
@@ -238,9 +252,12 @@ void PurePursuit::PurePursuitPeriodic(void)
     double calcRdrive = Robot::m_drivetrain->V2P_calc(target_Rv);
 
     //Cheap limiter by slowly ramping up power
-    const double limiter = 0.05;
-    calcLdrive += (calcLdrive - curr_Lpow) * limiter;
-    calcRdrive += (calcRdrive - curr_Rpow) * limiter;
+    const double limiter = 0.1;
+    calcLdrive = curr_Lpow + (calcLdrive - curr_Lpow) * limiter;
+    calcRdrive = curr_Rpow + (calcRdrive - curr_Rpow) * limiter;
+
+curr_Lpow = calcLdrive;
+curr_Rpow = calcRdrive;
 
     // *** ToDo:
     //Lff, Rff
@@ -264,15 +281,15 @@ void PurePursuit::PurePursuitPeriodic(void)
     *m_logfile << std::fixed << std::setprecision(3);
 
     *m_logfile << curr_time                                 << ","; // 1:  Time
-    *m_logfile << curr_x  <<" "<< curr_y                    << ","; // 2:  X,Y
+    *m_logfile << curr_x  <<","<< curr_y                    << ","; // 2:  X,Y
     *m_logfile << Robot::m_drivetrain->GetGyroAngle()       << ","; // 3:  Yaw
-    *m_logfile << curr_Lv <<" "<< curr_Rv                   << ","; // 4:  Vel
+    *m_logfile << curr_Lv <<","<< curr_Rv                   << ","; // 4:  Vel
 
     *m_logfile << ppindex                                  << ","; // 4:  index
-    *m_logfile <<  lookahead_pt.x <<" "<< lookahead_pt.y   << ","; // 5:  lookahead x,y
+    *m_logfile <<  lookahead_pt.x <<","<< lookahead_pt.y   << ","; // 5:  lookahead x,y
     *m_logfile << curvature                                << ","; // 4:  curve
-    *m_logfile << target_Lv  <<" "<< target_Rv             << ","; // 4:  target vel
-    *m_logfile << calcLdrive <<" "<< calcRdrive            << ","; // 4:  calc drive
+    *m_logfile << target_Lv  <<","<< target_Rv             << ","; // 4:  target vel
+    *m_logfile << calcLdrive <<","<< calcRdrive                  ; // 4:  calc drive
 
 
 
@@ -328,8 +345,16 @@ coord_t PurePursuit::FindLookaheadPoint(void)
     double curr_x = Robot::m_odometry->GetX();
     double curr_y = Robot::m_odometry->GetY();
 
-    for(unsigned int i = m_profile.size()-2;  i>=0;  i-- )
+    for(unsigned int i = m_profile.size()-2;  i>0;  i-- )
     {
+
+        //Sanity check - check for rolled over count
+        if( i > m_profile.size() )
+        {
+            m_isPathError = true;
+            cout<< PINDENT << "*** Invalid LAP index" << endl;
+            return {-1,-1}; //????
+        }
 
         //L-E:  Profile line segment angle vector
         d.x = m_profile[i+1].x - m_profile[i].x;
@@ -387,8 +412,9 @@ coord_t PurePursuit::FindLookaheadPoint(void)
     }
 
     //If here, no intersection was found.  Robot Left the path!
-    //Need a better way of returning failed searches ??
-    return {-1,-1}; //????
+    m_isPathError = true;
+    cout<< PINDENT << "*** No LAP Found!!" << endl;
+    return {-1,-1}; 
 
 }
 

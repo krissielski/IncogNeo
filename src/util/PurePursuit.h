@@ -39,6 +39,7 @@ class PurePursuit
 
         //Local Variables
         bool m_isPathDone;
+        bool m_isPathError;     //Most likely left path
 
 
         //File Logging
@@ -56,6 +57,7 @@ class PurePursuit
         void PurePursuitInit(void);
         void PurePursuitEnd(void);
         bool PurePursuitIsDone(void);
+        bool PurePursuitIsError(void);
 
 
 };
