@@ -28,7 +28,7 @@ using namespace std;
 
 //****** PARAMETERS WE NEED TO DEFINE
 #define LOOKAHEAD_DISTANCE      20.0          //inches (radius)
-#define ROBOT_TRACK_WIDTH       32
+#define ROBOT_TRACK_WIDTH       30
 
 const double PI = 3.14159;
 
@@ -50,6 +50,8 @@ PurePursuit::PurePursuit( std::string profile_filename )
     //Init
     m_isPathDone  = false;
     m_isPathError = false;
+    m_curr_Ldrive = 0;
+    m_curr_Rdrive = 0;
     m_logfile = new std::ofstream();
 
 }
@@ -95,7 +97,7 @@ void PurePursuit::LoadProfile( std::string profile_filename )
         if( first_line )
         {
             first_line = false;
-            cout<< PINDENT << line  << endl;
+            cout<< PINDENT << line;//  << endl;
             continue;
         }
 
@@ -181,6 +183,12 @@ void PurePursuit::PurePursuitInit(void)
     LogfileOpen();
     m_logStartTime = frc::Timer::GetFPGATimestamp();
 
+    //Get current motor drive power in case we were moving when called...
+    m_curr_Ldrive = Robot::m_drivetrain->GetLeftMotor();;
+    m_curr_Rdrive = Robot::m_drivetrain->GetRightMotor();;
+
+
+
 }
 /*******************************
  ** PurePursuitEnd
@@ -234,30 +242,49 @@ void PurePursuit::PurePursuitPeriodic(void)
 
     //Calculate Left and Right target velocities
     //  +curve=Right turn = higher Left drive
-    //  -curve=Left turn  = highrt right drive
+    //  -curve=Left turn  = higher right drive
     double target_Lv = m_profile[ppindex].velocity * (2 + curvature*ROBOT_TRACK_WIDTH)/2;
     double target_Rv = m_profile[ppindex].velocity * (2 - curvature*ROBOT_TRACK_WIDTH)/2;
 
     double curr_Lv   = Robot::m_odometry->GetLVel();
     double curr_Rv   = Robot::m_odometry->GetRVel();
 
-    //double curr_Lpow = Robot::m_drivetrain->GetLeftMotor();
-    //double curr_Rpow = Robot::m_drivetrain->GetRightMotor();
-    static double curr_Lpow = 0;
-    static double curr_Rpow = 0;
+    //There is something odd going on getting motor drive power periodically.
+    //Ditch this in favor of maintaining what we last sent to the motors 
+    // ===> m_curr_Ldrive, m_curr_Rdrive
+    //****double curr_Lpow = Robot::m_drivetrain->GetLeftMotor();
+    //****double curr_Rpow = Robot::m_drivetrain->GetRightMotor();
 
 
-    //Get Power required for target velocity
-    double calcLdrive = Robot::m_drivetrain->V2P_calc(target_Lv);
-    double calcRdrive = Robot::m_drivetrain->V2P_calc(target_Rv);
+    //Get FF Power required for target velocity
+    double calcLff = Robot::m_drivetrain->V2P_calc(target_Lv);
+    double calcRff = Robot::m_drivetrain->V2P_calc(target_Rv);
 
-    //Cheap limiter by slowly ramping up power
-    const double limiter = 0.1;
-    calcLdrive = curr_Lpow + (calcLdrive - curr_Lpow) * limiter;
-    calcRdrive = curr_Rpow + (calcRdrive - curr_Rpow) * limiter;
 
-curr_Lpow = calcLdrive;
-curr_Rpow = calcRdrive;
+    //Calculate FB parameters
+    const double kP = 0.01;
+    double calcLfb = kP * (target_Lv-curr_Lv);
+    double calcRfb = kP * (target_Rv-curr_Rv);
+
+    //Drive power = FF + FB
+    double calcLdrive = calcLff + calcLfb;
+    double calcRdrive = calcRff + calcRfb;
+
+    //Constraints check.    0.1 < drive < 1.0
+    //if( calcLdrive < 0.1 ) calcLdrive = 0.1;
+    if( calcLdrive > 1.0 ) calcLdrive = 1.0;
+    //if( calcRdrive < 0.1 ) calcRdrive = 0.1;
+    if( calcRdrive > 1.0 ) calcRdrive = 1.0;
+
+
+    //Drive dampening by slowly ramping up power
+    const double limiter = 0.7;
+    calcLdrive = m_curr_Ldrive + (calcLdrive - m_curr_Ldrive) * limiter;
+    calcRdrive = m_curr_Ldrive + (calcRdrive - m_curr_Ldrive) * limiter;
+
+    //Update current Drive 
+    m_curr_Ldrive = calcLdrive;
+    m_curr_Ldrive = calcRdrive;
 
     // *** ToDo:
     //Lff, Rff
@@ -467,8 +494,8 @@ void PurePursuit::LogfileOpen(void)
 
     //Generate path and filename into a string
     filename  = PATH_TO_LOGS;       //Start with directory
-    filename += "pp_";              //Add pp prefix
-    filename += tbuf;               //Add time file name
+    filename += "pp";              //Add pp prefix
+    //filename += tbuf;               //Add time file name  **Remove this during development**
     filename += ".csv";             //Add CSV as the extention
 
     //Finally, open the file

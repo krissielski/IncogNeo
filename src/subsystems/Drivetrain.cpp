@@ -24,8 +24,8 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 	rightMotor        = new frc::Spark(1);
 	differentialDrive = new frc::DifferentialDrive(*leftMotor, *rightMotor);
 
-	rightEncoder      = new frc::Encoder(0, 1, true , frc::Encoder::k4X);
-	leftEncoder       = new frc::Encoder(2, 3, false, frc::Encoder::k4X);
+	rightEncoder      = new frc::Encoder(2, 3, false, frc::Encoder::k4X);
+	leftEncoder       = new frc::Encoder(0, 1, true,  frc::Encoder::k4X);
 
 	ahrs  			  = new AHRS(SPI::Port::kMXP);
 

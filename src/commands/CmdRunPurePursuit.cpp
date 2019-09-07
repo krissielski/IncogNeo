@@ -49,6 +49,9 @@ bool CmdRunPurePursuit::IsFinished()
     if( pp->PurePursuitIsError() )
     {
         cout << " ** ABORT **  Path Error!"<<endl;
+
+        //** TODO:  Abort Autonomous code on path error!!!!! ***********************
+        //robot::auto_abort = true;
         return true;
     }
     return false;
