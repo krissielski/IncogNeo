@@ -27,7 +27,7 @@ using namespace std;
 #define NUM_PPARAM  3                               //Number of parameters to read from each profile line
 
 //****** PARAMETERS WE NEED TO DEFINE
-#define LOOKAHEAD_DISTANCE      20.0          //inches (radius)
+#define LOOKAHEAD_DISTANCE      25.0          //inches (radius)
 #define ROBOT_TRACK_WIDTH       30
 
 const double PI = 3.14159;
@@ -50,8 +50,6 @@ PurePursuit::PurePursuit( std::string profile_filename )
     //Init
     m_isPathDone  = false;
     m_isPathError = false;
-    m_curr_Ldrive = 0;
-    m_curr_Rdrive = 0;
     m_logfile = new std::ofstream();
 
 }
@@ -183,12 +181,6 @@ void PurePursuit::PurePursuitInit(void)
     LogfileOpen();
     m_logStartTime = frc::Timer::GetFPGATimestamp();
 
-    //Get current motor drive power in case we were moving when called...
-    m_curr_Ldrive = Robot::m_drivetrain->GetLeftMotor();;
-    m_curr_Rdrive = Robot::m_drivetrain->GetRightMotor();;
-
-
-
 }
 /*******************************
  ** PurePursuitEnd
@@ -240,20 +232,22 @@ void PurePursuit::PurePursuitPeriodic(void)
     double curvature     = CalcCurvature(lookahead_pt );
 
 
+    //Get velocities
+    double req_velocity  = m_profile[ppindex].velocity; //requested from profile
+    double curr_velocity = Robot::m_odometry->GetVel(); //current
+
+    //Velocity Rate Limiter
+    const double VEL_RAMP_LIMIT = 20;    //(500/50);      //500 in/sec @ 50hz
+    if( req_velocity > (curr_velocity + VEL_RAMP_LIMIT) )   req_velocity = curr_velocity + VEL_RAMP_LIMIT;
+
     //Calculate Left and Right target velocities
     //  +curve=Right turn = higher Left drive
     //  -curve=Left turn  = higher right drive
-    double target_Lv = m_profile[ppindex].velocity * (2 + curvature*ROBOT_TRACK_WIDTH)/2;
-    double target_Rv = m_profile[ppindex].velocity * (2 - curvature*ROBOT_TRACK_WIDTH)/2;
+    double target_Lv = req_velocity * (2 + curvature*ROBOT_TRACK_WIDTH)/2;
+    double target_Rv = req_velocity * (2 - curvature*ROBOT_TRACK_WIDTH)/2;
 
     double curr_Lv   = Robot::m_odometry->GetLVel();
     double curr_Rv   = Robot::m_odometry->GetRVel();
-
-    //There is something odd going on getting motor drive power periodically.
-    //Ditch this in favor of maintaining what we last sent to the motors 
-    // ===> m_curr_Ldrive, m_curr_Rdrive
-    //****double curr_Lpow = Robot::m_drivetrain->GetLeftMotor();
-    //****double curr_Rpow = Robot::m_drivetrain->GetRightMotor();
 
 
     //Get FF Power required for target velocity
@@ -277,14 +271,6 @@ void PurePursuit::PurePursuitPeriodic(void)
     if( calcRdrive > 1.0 ) calcRdrive = 1.0;
 
 
-    //Drive dampening by slowly ramping up power
-    const double limiter = 0.7;
-    calcLdrive = m_curr_Ldrive + (calcLdrive - m_curr_Ldrive) * limiter;
-    calcRdrive = m_curr_Ldrive + (calcRdrive - m_curr_Ldrive) * limiter;
-
-    //Update current Drive 
-    m_curr_Ldrive = calcLdrive;
-    m_curr_Ldrive = calcRdrive;
 
     // *** ToDo:
     //Lff, Rff
@@ -307,16 +293,16 @@ void PurePursuit::PurePursuitPeriodic(void)
 
     *m_logfile << std::fixed << std::setprecision(3);
 
-    *m_logfile << curr_time                                 << ","; // 1:  Time
-    *m_logfile << curr_x  <<","<< curr_y                    << ","; // 2:  X,Y
-    *m_logfile << Robot::m_drivetrain->GetGyroAngle()       << ","; // 3:  Yaw
-    *m_logfile << curr_Lv <<","<< curr_Rv                   << ","; // 4:  Vel
+    *m_logfile << curr_time                                 << ","; // A:  Time
+    *m_logfile << curr_x  <<","<< curr_y                    << ","; // BC: X,Y
+    *m_logfile << Robot::m_drivetrain->GetGyroAngle()       << ","; // D:  Yaw
+    *m_logfile << curr_Lv <<","<< curr_Rv                   << ","; // EF: Vel
 
-    *m_logfile << ppindex                                  << ","; // 4:  index
-    *m_logfile <<  lookahead_pt.x <<","<< lookahead_pt.y   << ","; // 5:  lookahead x,y
-    *m_logfile << curvature                                << ","; // 4:  curve
-    *m_logfile << target_Lv  <<","<< target_Rv             << ","; // 4:  target vel
-    *m_logfile << calcLdrive <<","<< calcRdrive                  ; // 4:  calc drive
+    *m_logfile << ppindex                                  << ","; // G:   index
+    *m_logfile <<  lookahead_pt.x <<","<< lookahead_pt.y   << ","; // HI:  lookahead x,y
+    *m_logfile << curvature                                << ","; // J:   curve
+    *m_logfile << target_Lv  <<","<< target_Rv             << ","; // KL:  target vel
+    *m_logfile << calcLdrive <<","<< calcRdrive                  ; // MN:  calc drive
 
 
 
@@ -502,7 +488,24 @@ void PurePursuit::LogfileOpen(void)
 	m_logfile->open(filename, std::ios::out | std::ios::trunc );    
 
     if( !m_logfile->is_open() )
+    {
         std::cout<<"*** Could NOT Open m_logfile!!!!"<<std::endl;
+        return;
+    }
+
+
+    //Write Header
+    *m_logfile << "Time"        << ","; // A:  Time
+    *m_logfile << "X,Y"         << ","; // BC: X,Y
+    *m_logfile << "Gyro"        << ","; // D:  Yaw
+    *m_logfile << "Lv,Rv"       << ","; // EF: Vel
+    *m_logfile << "ppindex"     << ","; // G:  index
+    *m_logfile << "lapX,lapY"   << ","; // HI: lookahead x,y
+    *m_logfile << "curve"       << ","; // J:  curve
+    *m_logfile << "tLv,tRv"     << ","; // KL: target vel
+    *m_logfile << "LD,RD"             ; // MN: calc drive
+
+    *m_logfile << "\n";
 
 }
 void PurePursuit::LogfileClose(void)
