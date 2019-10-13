@@ -46,10 +46,12 @@ void Odometry::OdometryPeriodic(void)
     double timestamp = Robot::m_timer->GetFPGATimestamp();
 
 
-    int delta_left_enc  = ( left_enc  - m_prev_left_enc);
-    int delta_right_enc = ( right_enc - m_prev_right_enc);
+    double delta_left_enc  = ( left_enc  - m_prev_left_enc)  / Robot::m_drivetrain->LEFT_ENCODER_TPI;
+    double delta_right_enc = ( right_enc - m_prev_right_enc) / Robot::m_drivetrain->RIGHT_ENCODER_TPI;
 
-    double distance = (delta_left_enc + delta_right_enc)/( 2.0 * Robot::m_drivetrain->ENC_TICKS_PER_INCH );
+    double distance = (delta_left_enc + delta_right_enc) / 2.0;
+
+
 
     //Calculate new X and Y based on Gyro
     double angle = Robot::m_drivetrain->GetGyroAngle();
@@ -61,8 +63,8 @@ void Odometry::OdometryPeriodic(void)
     double delta_time = timestamp - m_prev_timestamp;
 
     m_curr_v  =  distance / delta_time;
-    m_curr_Lv =  delta_left_enc /(Robot::m_drivetrain->ENC_TICKS_PER_INCH*delta_time);
-    m_curr_Rv =  delta_right_enc/(Robot::m_drivetrain->ENC_TICKS_PER_INCH*delta_time);
+    m_curr_Lv =  delta_left_enc  / delta_time;
+    m_curr_Rv =  delta_right_enc / delta_time;
 
 
     //Update parameters for next run

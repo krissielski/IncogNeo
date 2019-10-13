@@ -1,0 +1,91 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="navx_Yaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="284" y="336"/>
+	</widget>
+	<widget field="D_R_Trig" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="541" y="178"/>
+	</widget>
+	<widget field="Curr_Vel" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="268" y="56"/>
+	</widget>
+	<widget field="R_Motor" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="387" y="174"/>
+	</widget>
+	<widget field="D_R_X_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="526" y="81"/>
+	</widget>
+	<widget field="L_Motor" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="229" y="172"/>
+	</widget>
+	<widget field="VRTest_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="55" y="314"/>
+	</widget>
+	<widget field="navx_IsConn" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="270" y="283"/>
+	</widget>
+	<widget field="D_L_Y_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="529" y="105"/>
+	</widget>
+	<widget field="VRTest_Time" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="61" y="338"/>
+	</widget>
+	<widget field="D_L_Trig" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="541" y="127"/>
+	</widget>
+	<widget field="D_L_X_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="530" y="151"/>
+	</widget>
+	<widget field="navx_Rate" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="280" y="375"/>
+	</widget>
+	<widget field="navx_Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="276" y="308"/>
+	</widget>
+	<widget field="D_R_Y_axis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="526" y="58"/>
+	</widget>
+	<widget field="Curr_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="279" y="81"/>
+		<height>20</height>
+	</widget>
+	<widget field="Curr_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="280" y="105"/>
+	</widget>
+	<widget field="RightEnc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="383" y="199"/>
+	</widget>
+	<widget field="LeftEnc" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="232" y="197"/>
+	</widget>
+	<widget field="CmdRunPurePursuit" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="18" y="392"/>
+	</widget>
+	<widget field="GrpVelocityRampTest" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="12" y="279"/>
+	</widget>
+	<widget field="CmdDriveClearAll" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="31" y="226"/>
+	</widget>
+</dashboard>
+<live-window>
+	<widget field="Drivetrain" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<location x="6" y="1"/>
+	</widget>
+	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<widget field="Encoder[2]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="16"/>
+			<height>97</height>
+			<width>203</width>
+		</widget>
+		<widget field="Encoder[0]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="113"/>
+			<height>97</height>
+			<width>203</width>
+		</widget>
+		<location x="24" y="10"/>
+		<width>215</width>
+		<height>216</height>
+	</widget>
+</live-window>
+</xml>

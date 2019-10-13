@@ -11,18 +11,26 @@
 
 #include "commands/CmdDriveWithGamepad.h"
 
-
 //Drivetrain Constants
-const double Drivetrain::ENC_TICKS_PER_INCH = 41.9;		//Calibrated IncogSparks 8/25/19
+//const double Drivetrain::ENC_TICKS_PER_INCH = 41.9;		//Calibrated IncogSparks 8/25/19
+//Encoder TICKS PER INCH Calibration
+const double Drivetrain::LEFT_ENCODER_TPI  = 40.6;			//Calibrated IncogNeo 10/13/19
+const double Drivetrain::RIGHT_ENCODER_TPI = 41.45;			//Calibrated IncogNeo 10/13/19
 
 #define MAX_DRIVE       0.95
 
 
 Drivetrain::Drivetrain() : Subsystem("Drivetrain") 
 {
-	leftMotor         = new frc::Spark(0);
-	rightMotor        = new frc::Spark(1);
-	differentialDrive = new frc::DifferentialDrive(*leftMotor, *rightMotor);
+	//leftMotor         = new frc::Spark(0);
+	//rightMotor        = new frc::Spark(1);
+
+	m_leftNeoMaster   = new rev::CANSparkMax( 4, rev::CANSparkMax::MotorType::kBrushless );
+	m_leftNeoSlave 	  = new rev::CANSparkMax( 5, rev::CANSparkMax::MotorType::kBrushless );
+	m_rightNeoMaster  = new rev::CANSparkMax( 7, rev::CANSparkMax::MotorType::kBrushless );
+	m_rightNeoSlave   = new rev::CANSparkMax( 6, rev::CANSparkMax::MotorType::kBrushless );
+
+	differentialDrive = new frc::DifferentialDrive(*m_leftNeoMaster, *m_rightNeoMaster);
 
 	rightEncoder      = new frc::Encoder(2, 3, false, frc::Encoder::k4X);
 	leftEncoder       = new frc::Encoder(0, 1, true,  frc::Encoder::k4X);
@@ -43,6 +51,23 @@ void Drivetrain::InitDefaultCommand() {
 // Put methods for controlling this subsystem
 // here. Call these from Commands.
 
+
+
+
+//**************************************************************
+void Drivetrain::NeoSetup(void)
+{
+	std::cout << "Drivetrain::NeoSetup" << std::endl;
+    //Follower
+    m_leftNeoSlave->Follow(*m_leftNeoMaster);
+    m_rightNeoSlave->Follow(*m_rightNeoMaster);
+
+    //Inverted
+    m_leftNeoMaster->SetInverted( false );
+    m_leftNeoSlave->SetInverted( false );
+    m_rightNeoMaster->SetInverted( false );
+    m_rightNeoSlave->SetInverted( false );
+}
 
 //**************************************************************
 void Drivetrain::DrivetrainPeriodic(void)
@@ -111,11 +136,11 @@ void Drivetrain::Stop( void )
 //**************************************************************
 double Drivetrain::GetRightMotor(void)
 {
-	return rightMotor->Get();
+	return m_rightNeoMaster->Get();
 }
 double Drivetrain::GetLeftMotor(void)
 {
-	return leftMotor->Get();
+	return m_leftNeoMaster->Get();
 }
 
 
@@ -179,8 +204,9 @@ double Drivetrain::V2P_calc( double velocity )
 	//    and finding max velocity
 	//  then solving formula for a line (y-mx=b)
 	//  where x=power and y=velocity
-	const double m = 275.0;		//Slope
-	const double b = -44.0;		//Y-intercept
+	// *** Calibrated for IncogNeo 10/13/2019
+	const double m = 250.0;		//Slope
+	const double b = 7.5;		//Y-intercept
 
 	//y=mx+b  ==>  x = (y-b)/m  
 	double power = (velocity - b)/m;	//power calc

@@ -32,7 +32,7 @@ void Robot::RobotInit() {
 
     //*************************** INIT ******************************
     std::cout<<"RobotInit"<<std::endl;
-    std::cout<<"IncogSparks: Offseason 2019"<<std::endl;
+    std::cout<<"IncogNeo: Offseason 2019"<<std::endl;
     std::cout<<"Version: " << __DATE__ <<"  "<<__TIME__<<std::endl<<std::endl; 
 
 
@@ -48,6 +48,8 @@ void Robot::RobotInit() {
 
     //Subsystem Inits
     m_odometry->Reset();
+
+    m_drivetrain->NeoSetup();
 
 
 }

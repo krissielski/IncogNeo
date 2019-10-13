@@ -43,8 +43,8 @@ void CmdDriveFwdGyro::Execute()
 bool CmdDriveFwdGyro::IsFinished() 
 {
 
-	double l_dir = Robot::m_drivetrain->GetLeftEncoder()/Drivetrain::ENC_TICKS_PER_INCH;
-	double r_dir = Robot::m_drivetrain->GetRightEncoder()/Drivetrain::ENC_TICKS_PER_INCH;
+	double l_dir = Robot::m_drivetrain->GetLeftEncoder()/Drivetrain::LEFT_ENCODER_TPI;
+	double r_dir = Robot::m_drivetrain->GetRightEncoder()/Drivetrain::RIGHT_ENCODER_TPI;
 
 	if(  (l_dir > m_distance) || (r_dir > m_distance)  )
 	  return true;

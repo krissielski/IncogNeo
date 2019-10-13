@@ -10,13 +10,19 @@
 #include <frc/commands/Subsystem.h>
 #include "frc/WPILib.h"
 #include "AHRS.h"
+#include "rev/CANSparkMax.h"
 
 class Drivetrain : public frc::Subsystem {
 private:
 
     //Components
-    frc::SpeedController    *leftMotor;
-    frc::SpeedController    *rightMotor;
+    //frc::SpeedController    *leftMotor;
+    //frc::SpeedController    *rightMotor;
+    rev::CANSparkMax *m_leftNeoMaster;
+    rev::CANSparkMax *m_leftNeoSlave ;
+    rev::CANSparkMax *m_rightNeoMaster;
+    rev::CANSparkMax *m_rightNeoSlave;
+
     frc::DifferentialDrive  *differentialDrive;
 
     frc::Encoder            *rightEncoder;
@@ -31,10 +37,13 @@ public:
     void InitDefaultCommand() override;
 
     //Drivetrain Constants
-    const static double ENC_TICKS_PER_INCH;
+    //const static double ENC_TICKS_PER_INCH;
+    const static double LEFT_ENCODER_TPI;
+    const static double RIGHT_ENCODER_TPI;
 
     //Our Functions
     void DrivetrainPeriodic(void);
+    void NeoSetup(void);
 
 
     //Drive

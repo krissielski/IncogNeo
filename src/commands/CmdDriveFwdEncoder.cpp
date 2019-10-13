@@ -29,8 +29,8 @@ void CmdDriveFwdEncoder::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void CmdDriveFwdEncoder::Execute() 
 {
- 	double l_dir = Robot::m_drivetrain->GetLeftEncoder()/Drivetrain::ENC_TICKS_PER_INCH;
-	double r_dir = Robot::m_drivetrain->GetRightEncoder()/Drivetrain::ENC_TICKS_PER_INCH;
+ 	double l_dir = Robot::m_drivetrain->GetLeftEncoder()/Drivetrain::LEFT_ENCODER_TPI;
+	double r_dir = Robot::m_drivetrain->GetRightEncoder()/Drivetrain::RIGHT_ENCODER_TPI;
 	double delta = l_dir - r_dir;
 	double kp    = -0.4; //was -0.18
 
@@ -42,8 +42,8 @@ void CmdDriveFwdEncoder::Execute()
 bool CmdDriveFwdEncoder::IsFinished() 
 {
 
-	double l_dir = Robot::m_drivetrain->GetLeftEncoder()/Drivetrain::ENC_TICKS_PER_INCH;
-	double r_dir = Robot::m_drivetrain->GetRightEncoder()/Drivetrain::ENC_TICKS_PER_INCH;
+	double l_dir = Robot::m_drivetrain->GetLeftEncoder()/Drivetrain::LEFT_ENCODER_TPI;
+	double r_dir = Robot::m_drivetrain->GetRightEncoder()/Drivetrain::RIGHT_ENCODER_TPI;
 
 	if(  (l_dir > m_distance) || (r_dir > m_distance)  )
 	  return true;

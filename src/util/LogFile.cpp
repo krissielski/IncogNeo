@@ -109,7 +109,7 @@ void LogFile::LogfileOpen(void)
     {
         std::cout<<"LogFile Opened: " << tbuf <<std::endl;
         //Write header
-        logfile << "Time "      << ","; // 1:  ms since start
+        logfile << "Time"      << ","; // 1:  ms since start
 
         logfile << "Yaw"        << ","; // 4:  Yaw
         logfile << "LMotor"     << ","; // 5:  LeftMotor
