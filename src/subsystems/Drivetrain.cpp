@@ -206,7 +206,7 @@ double Drivetrain::V2P_calc( double velocity )
 	//  where x=power and y=velocity
 	// *** Calibrated for IncogNeo 10/13/2019
 	const double m = 250.0;		//Slope
-	const double b = 7.5;		//Y-intercept
+	const double b = 0;		//Y-intercept
 
 	//y=mx+b  ==>  x = (y-b)/m  
 	double power = (velocity - b)/m;	//power calc

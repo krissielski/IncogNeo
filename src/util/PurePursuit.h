@@ -41,6 +41,11 @@ class PurePursuit
         bool m_isPathDone;
         bool m_isPathError;     //Pure Pursuit algorithm calculation error (Left Path, timeout, ect)
 
+        unsigned int m_curr_ppindex;
+        unsigned int m_curr_ppindex_count;
+
+        double m_prev_target_Lv;
+        double m_prev_target_Rv;
 
         //File Logging
         std::ofstream *m_logfile;

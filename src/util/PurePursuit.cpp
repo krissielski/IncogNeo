@@ -28,7 +28,7 @@ using namespace std;
 
 //****** PARAMETERS WE NEED TO DEFINE
 #define LOOKAHEAD_DISTANCE      25.0          //inches (radius)
-#define ROBOT_TRACK_WIDTH       30
+#define ROBOT_TRACK_WIDTH       26
 
 const double PI = 3.14159;
 
@@ -178,6 +178,17 @@ void PurePursuit::PurePursuitInit(void)
 {
     cout<<"PP Init" << endl;
 
+    m_isPathDone  = false;
+    m_isPathError = false;
+
+    m_curr_ppindex  = 0;
+    m_curr_ppindex_count = 0;
+
+    
+    m_prev_target_Lv = 0.0;
+    m_prev_target_Rv = 0.0;
+
+
     LogfileOpen();
     m_logStartTime = frc::Timer::GetFPGATimestamp();
 
@@ -226,7 +237,29 @@ void PurePursuit::PurePursuitPeriodic(void)
 
     coord_t lookahead_pt = FindLookaheadPoint();
 
-    //Check to see if we left path
+
+    //Sanity check that we are finding increasing path profiles points
+    if( ppindex > m_curr_ppindex )
+    {
+        //Found new index.  Assume we are moving OK and clear counter
+        m_curr_ppindex = ppindex;
+        m_curr_ppindex_count = 0;
+    }
+    else
+    {
+        //Not a new index, inc counter
+        m_curr_ppindex_count++;
+        //@20ms, 50 = 1 second 
+        if(m_curr_ppindex_count>50 )
+        {
+            //TIMEOUT ERROR.   Abort!
+            m_isPathError = true;
+            cout<< PINDENT << "*** ppindex Timeout!!" << endl;
+        }
+    }
+
+
+    //Check to see if Pathfinding error occured
     if( m_isPathError  ) return;
     
     double curvature     = CalcCurvature(lookahead_pt );
@@ -251,18 +284,24 @@ void PurePursuit::PurePursuitPeriodic(void)
 
 
     //Get FF Power required for target velocity
-    double calcLff = Robot::m_drivetrain->V2P_calc(target_Lv);
-    double calcRff = Robot::m_drivetrain->V2P_calc(target_Rv);
+    double calcLVff = Robot::m_drivetrain->V2P_calc(target_Lv);
+    double calcRVff = Robot::m_drivetrain->V2P_calc(target_Rv);
 
+    //Calc FF Power for accleration
+    //This was good for damping ocillations
+    const double kA = 0.002;        //a Guess
+    double calcLAff = (target_Lv - m_prev_target_Lv) * kA;
+    double calcRAff = (target_Rv - m_prev_target_Rv) * kA;
 
     //Calculate FB parameters
-    const double kP = 0.01;
+    // kP thought -> pick kP to make power at half Max velocity
+    const double kP = 0.004;        //@50 = 0.2
     double calcLfb = kP * (target_Lv-curr_Lv);
     double calcRfb = kP * (target_Rv-curr_Rv);
 
-    //Drive power = FF + FB
-    double calcLdrive = calcLff + calcLfb;
-    double calcRdrive = calcRff + calcRfb;
+    //Drive power = FFv + FFa + FB
+    double calcLdrive = calcLVff + calcLAff + calcLfb;
+    double calcRdrive = calcRVff + calcRAff + calcRfb;
 
     //Constraints check.    0.1 < drive < 1.0
     //if( calcLdrive < 0.1 ) calcLdrive = 0.1;
@@ -271,14 +310,12 @@ void PurePursuit::PurePursuitPeriodic(void)
     if( calcRdrive > 1.0 ) calcRdrive = 1.0;
 
 
-
-    // *** ToDo:
-    //Lff, Rff
-    //Lfb, Rfb
-    //kV,  kA, kP
-
     //Finally, write to drivetrain
     Robot::m_drivetrain->Drive(calcLdrive,calcRdrive);
+
+    //Clean up
+    m_prev_target_Lv = target_Lv;
+    m_prev_target_Rv = target_Rv;
 
     // *******   LOG FILE ********************************************
     if( !m_logfile->is_open() ) return;
