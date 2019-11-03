@@ -10,6 +10,7 @@
 #include "commands/CmdRunPurePursuit.h"
 #include "commands/GrpVelocityRampTest.h"
 #include "commands/CmdDriveClearAll.h"
+#include "commands/GrpPathfindingTest.h"
 
 OI::OI() 
 {
@@ -20,6 +21,9 @@ OI::OI()
     frc::SmartDashboard::PutData("CmdDriveClearAll",    new CmdDriveClearAll( ) );
     frc::SmartDashboard::PutData("CmdRunPurePursuit",   new CmdRunPurePursuit( "output.csv") );
     frc::SmartDashboard::PutData("GrpVelocityRampTest", new GrpVelocityRampTest( ) );
+
+    frc::SmartDashboard::PutData("GrpPathfindingTest", new GrpPathfindingTest( ) );
+
 
 }
 
